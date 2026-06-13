@@ -428,7 +428,7 @@ def qrcode_login():
         return
     try:
         headers = {
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36',
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
         }
         res = requests.get('https://passport.bilibili.com/x/passport-login/web/qrcode/generate', headers=headers).json()
     except:
@@ -456,7 +456,7 @@ def qrcode_login():
 def polling_login_status(key):
     session = requests.Session()
     headers = {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
     }
     for i in range(50):
         try:
@@ -535,7 +535,7 @@ def generate_ass(cid):
     if xbmcvfs.exists(assfile):
         return assfile
     headers = {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36'
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36'
     }
 
     try:
@@ -604,8 +604,11 @@ def get_uid():
 
 def post_data(url, data):
     headers = {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
         'Referer': 'https://www.bilibili.com',
+        'Accept-Encoding': 'gzip, deflate',  # requests 不支持 br，避免服务端返回无法解压的 brotli 响应
+        'Accept': 'application/json, text/plain, */*',
+        'Origin': 'https://www.bilibili.com',
     }
     cookie = get_cookie()
     if cookie:
@@ -620,8 +623,11 @@ def post_data(url, data):
 def raw_fetch_url(url):
     xbmc.log('url_get: ' + url)
     headers = {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
         'Referer': 'https://www.bilibili.com',
+        'Accept-Encoding': 'gzip, deflate',  # requests 不支持 br，避免服务端返回无法解压的 brotli 响应
+        'Accept': 'application/json, text/plain, */*',
+        'Origin': 'https://www.bilibili.com',
     }
     cookie = get_cookie()
     if cookie:
