@@ -22,6 +22,9 @@ except AttributeError:
 
 plugin = Plugin()
 
+# Wbi keys 内存缓存，按自然日刷新（与 PiliPlus 策略一致）
+_wbi_keys_cache = {'img_key': '', 'sub_key': '', 'date': ''}
+
 mixinKeyEncTab = [
     46, 47, 18, 2, 53, 8, 23, 32, 15, 50, 10, 31, 58, 3, 45, 35, 27, 43, 5, 49,
     33, 9, 42, 19, 29, 28, 14, 39, 12, 38, 41, 13, 37, 48, 7, 16, 24, 55, 40,
@@ -696,13 +699,23 @@ def encWbi(params: dict, img_key: str, sub_key: str):
 
 
 def getWbiKeys():
-    '获取最新的 img_key 和 sub_key'
-    json_content = get_api_data('/x/web-interface/nav')
-    img_url: str = json_content['data']['wbi_img']['img_url']
-    sub_url: str = json_content['data']['wbi_img']['sub_url']
-    img_key = img_url.rsplit('/', 1)[1].split('.')[0]
-    sub_key = sub_url.rsplit('/', 1)[1].split('.')[0]
-    return img_key, sub_key
+    '获取最新的 img_key 和 sub_key（内存缓存，按自然日刷新，与 PiliPlus 策略一致）'
+    today = datetime.now().strftime('%Y-%m-%d')
+    if _wbi_keys_cache['img_key'] and _wbi_keys_cache['date'] == today:
+        return _wbi_keys_cache['img_key'], _wbi_keys_cache['sub_key']
+    json_content = raw_get_api_data('/x/web-interface/nav')
+    try:
+        img_url: str = json_content['data']['wbi_img']['img_url']
+        sub_url: str = json_content['data']['wbi_img']['sub_url']
+    except (KeyError, TypeError):
+        # 请求失败时若有旧缓存则沿用，避免完全失败
+        if _wbi_keys_cache['img_key']:
+            return _wbi_keys_cache['img_key'], _wbi_keys_cache['sub_key']
+        raise
+    _wbi_keys_cache['img_key'] = img_url.rsplit('/', 1)[1].split('.')[0]
+    _wbi_keys_cache['sub_key'] = sub_url.rsplit('/', 1)[1].split('.')[0]
+    _wbi_keys_cache['date'] = today
+    return _wbi_keys_cache['img_key'], _wbi_keys_cache['sub_key']
 
 
 def get_categories():
