@@ -1619,20 +1619,25 @@ def favlist(id, page):
 def home(page):
     videos = []
     page = int(page)
-    url = '/x/web-interface/index/top/feed/rcmd'
-    data = {
-        'y_num': 3,
-        'fresh_type': 4,
-        'feed_version': 'V8',
-        'fresh_idx_1h': page,
-        'fetch_row': 3 * page + 1,
-        'fresh_idx': page,
-        'brush': page,
-        'homepage_ver': 1,
-        'ps': 12,
-        'last_y_num': 4,
-        'outside_trigger': ''
-    }
+    url = '/x/web-interface/wbi/index/top/feed/rcmd'
+    img_key, sub_key = getWbiKeys()
+    data = encWbi(
+        params={
+            'y_num': 3,
+            'fresh_type': 4,
+            'feed_version': 'V8',
+            'fresh_idx_1h': page,
+            'fetch_row': 3 * page + 1,
+            'fresh_idx': page,
+            'brush': page,
+            'homepage_ver': 1,
+            'ps': 12,
+            'last_y_num': 4,
+            'outside_trigger': ''
+        },
+        img_key=img_key,
+        sub_key=sub_key
+    )
     res = get_api_data(url, data)
 
     if res['code'] != 0:
@@ -2012,9 +2017,9 @@ def video(id, cid, ispgc, audio_only, title):
             ispgc = False
 
     if ispgc:
-        url = '/pgc/player/web/playurl'
+        url = '/pgc/player/web/v2/playurl'
     else:
-        url = '/x/player/playurl'
+        url = '/x/player/wbi/playurl'
 
     qn = getSetting('video_resolution')
 
@@ -2024,7 +2029,15 @@ def video(id, cid, ispgc, audio_only, title):
             'cid': cid,
             'qn': qn,
             'fnval': 4048,
-            'fourk': 1
+            'fourk': 1,
+            'fnver': 0,
+            'voice_balance': 1,
+            'gaia_source': 'pre-load',
+            'web_location': 1315873,
+            'dm_img_list': '[]',
+            'dm_img_str': 'V2ViR0wgMS4wIChPcGVuR0wgRVMgMi4wIENocm9taXVtKQ',
+            'dm_cover_img_str': 'QVNJQ19TT0ZUV0FSRV9SRU5ERVJFUg',
+            'dm_img_inter': '{"ds":[],"wh":[0,0,0],"of":[0,0,0]}',
         }
     else:
         params = {
@@ -2032,15 +2045,24 @@ def video(id, cid, ispgc, audio_only, title):
             'cid': cid,
             'qn': qn,
             'fnval': 128,
-            'fourk': 1
+            'fourk': 1,
+            'fnver': 0,
+            'web_location': 1315873,
+            'dm_img_list': '[]',
+            'dm_img_str': 'V2ViR0wgMS4wIChPcGVuR0wgRVMgMi4wIENocm9taXVtKQ',
+            'dm_cover_img_str': 'QVNJQ19TT0ZUV0FSRV9SRU5ERVJFUg',
+            'dm_img_inter': '{"ds":[],"wh":[0,0,0],"of":[0,0,0]}',
         }
 
-    res = get_api_data(url, data=params)
+    img_key, sub_key = getWbiKeys()
+    signed_params = encWbi(params=params, img_key=img_key, sub_key=sub_key)
+    res = get_api_data(url, data=signed_params)
 
     if res['code'] != 0:
         return
     if ispgc:
-        data = res['result']
+        # pgc/player/web/v2/playurl 返回结构: result.video_info
+        data = res['result']['video_info']
     else:
         data = res['data']
 
