@@ -2074,7 +2074,13 @@ def video(id, cid, ispgc, audio_only, title):
 
     if 'dash' in data:
         if audio_only:
-            video_url = data['dash']['audio'][0]['baseUrl'] + '|Referer=https://www.bilibili.com'
+            video_url = data['dash']['audio'][0]['baseUrl'] + (
+                '|Referer=https://www.bilibili.com'
+                '&User-Agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)'
+                ' AppleWebKit/537.36 (KHTML, like Gecko)'
+                ' Chrome/125.0.0.0 Safari/537.36'
+                '&Origin=https://www.bilibili.com'
+            )
             video_url = {
                 'label': title,
                 'path': video_url
@@ -2094,19 +2100,32 @@ def video(id, cid, ispgc, audio_only, title):
                 return
             ip_address = '127.0.0.1'
             port = getSetting('server_port')
+            bili_headers = (
+                'Referer=https://www.bilibili.com'
+                '&User-Agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)'
+                ' AppleWebKit/537.36 (KHTML, like Gecko)'
+                ' Chrome/125.0.0.0 Safari/537.36'
+                '&Origin=https://www.bilibili.com'
+            )
             video_url = {
                 'path': 'http://{}:{}/{}.mpd'.format(ip_address, port, cid),
                 'properties': {
                     'inputstream': 'inputstream.adaptive',
                     'inputstream.adaptive.manifest_type': 'mpd',
-                    'inputstream.adaptive.manifest_headers': 'Referer=https://www.bilibili.com',
-                    'inputstream.adaptive.stream_headers': 'Referer=https://www.bilibili.com'
+                    'inputstream.adaptive.manifest_headers': bili_headers,
+                    'inputstream.adaptive.stream_headers': bili_headers,
                 }
             }
     elif 'durl' in data:
         video_url = data['durl'][0]['url']
         if video_url:
-            video_url += '|Referer=https://www.bilibili.com'
+            video_url += (
+                '|Referer=https://www.bilibili.com'
+                '&User-Agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)'
+                ' AppleWebKit/537.36 (KHTML, like Gecko)'
+                ' Chrome/125.0.0.0 Safari/537.36'
+                '&Origin=https://www.bilibili.com'
+            )
     else:
         video_url = ''
 
