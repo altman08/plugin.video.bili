@@ -1,0 +1,52 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read version from addon.xml
+        id: version
+        run: |
+          VERSION=$(grep -oP '<addon\b[^>]*\bversion="\K[^"]+' addon.xml)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Addon version: $VERSION"
+
+      - name: Build zip
+        run: |
+          ADDON_ID="plugin.video.bili"
+          ZIP_NAME="${ADDON_ID}-${{ steps.version.outputs.version }}.zip"
+          cd ..
+          zip -r "$ZIP_NAME" "$ADDON_ID/" \
+            --exclude "$ADDON_ID/.git/*" \
+            --exclude "$ADDON_ID/.github/*" \
+            --exclude "$ADDON_ID/public/*" \
+            --exclude "$ADDON_ID/README.md" \
+            --exclude "$ADDON_ID/*.zip"
+          mv "$ZIP_NAME" "$ADDON_ID/"
+          echo "ZIP_NAME=$ZIP_NAME" >> $GITHUB_ENV
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "Bilibili Kodi Plugin ${{ steps.version.outputs.version }}"
+          body: |
+            ## 安装方式
+
+            1. 下载下方 `plugin.video.bili-*.zip`
+            2. Kodi → 设置 → 插件 → 从 zip 文件安装
+            3. 选择下载的 zip 文件完成安装
+          files: plugin.video.bili-${{ steps.version.outputs.version }}.zip
+          draft: false
+          prerelease: false
